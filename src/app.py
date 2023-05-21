@@ -36,15 +36,51 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
+@app.route("/todos", methods=['GET', 'POST'])  # Aquí especificamos que estos endpoints aceptan solicitudes POST y GET.
+def get_todos():
+    response_body = [
+                        {
+                            "done": "true",
+                            "label": "Sample Todo 1"
+                        },
+                        {
+                            "done": "true",
+                            "label": "Sample Todo 2"
+                        }
+                    ]
+    if request.method == 'GET':  # Podemos entender qué tipo de request estamos manejando usando un condicional
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
-
+        return jsonify(response_body), 200
+    
+    body = request.get_json()  # Obtener el request body de la solicitud
+    response_body.append(body)
     return jsonify(response_body), 200
 
+@app.route('/todos/<int:todo_index>', methods=['DELETE'])
+def delete_todo(todo_index):
+    todo_index = int(todo_index)
+    if (todo_index < 0 or todo_index > 2) : return 'Introduzca numeros naturales'
+    data = [
+                {
+                    "done": "true",
+                    "label": "Sample Todo 1"
+                },
+                {
+                    "done": "true",
+                    "label": "Sample Todo 2"
+                },
+                {
+                    "done": "true",
+                    "label": "Sample Todo 3"
+                }
+            ]
+    # response = list(filter(lambda val: todo_index == val['label'], data))
+    if todo_index < len(data):
+        del data[todo_index]
+
+    return data, 200
+
+    
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
